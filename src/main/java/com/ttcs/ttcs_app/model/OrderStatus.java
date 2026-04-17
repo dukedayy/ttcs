@@ -1,0 +1,6 @@
+package com.ttcs.ttcs_app.model;
+
+public enum OrderStatus {
+    PENDING, CONFIRMED, DENIED, PROCESSING, SHIPPING, DELIVERED, COMPLETED,
+    CANCELLED, RETURNED, REFUNDED, RETURN_REQUESTED
+}

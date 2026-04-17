@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: ttcs-app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ttcs
+    username: duke
+    password: duke
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
