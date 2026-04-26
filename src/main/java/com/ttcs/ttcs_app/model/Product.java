@@ -47,7 +47,7 @@ public class Product {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "categoryId", referencedColumnName = "id", nullable = false)
-    private Category categoryId;
+    private Category category;
 
     private Float averageScore;
     private Integer views;
