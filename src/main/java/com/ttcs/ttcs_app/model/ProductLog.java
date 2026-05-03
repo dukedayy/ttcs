@@ -28,4 +28,9 @@ public class ProductLog {
     private ProductStatus newStatus;
 
     private LocalDateTime createdAt;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }

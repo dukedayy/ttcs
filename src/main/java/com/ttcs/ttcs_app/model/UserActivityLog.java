@@ -31,4 +31,8 @@ public class UserActivityLog {
     private Float stayTime;
 
     private LocalDateTime createdAt;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

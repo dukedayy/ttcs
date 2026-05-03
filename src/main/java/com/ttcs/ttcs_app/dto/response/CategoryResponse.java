@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CategoryResponseDTO {
+public class CategoryResponse {
     private String id;
     private String name;
 }

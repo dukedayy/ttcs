@@ -30,4 +30,9 @@ public class OrderLog {
     private OrderStatus newStatus;
     private String comment;
     private LocalDateTime createdAt;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }

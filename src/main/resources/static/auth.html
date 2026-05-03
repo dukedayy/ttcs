@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce - Đăng nhập / Đăng ký</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .auth-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+        }
+        .nav-pills .nav-link {
+            border-radius: 0;
+            color: #495057;
+            font-weight: 600;
+            padding: 15px;
+        }
+        .nav-pills .nav-link.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #0d6efd;
+        }
+        .btn-primary {
+            padding: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .input-group-text {
+            background-color: transparent;
+            border-right: none;
+        }
+        .form-control.with-icon {
+            border-left: none;
+        }
+        #alert-box {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container d-flex justify-content-center">
+    <div class="auth-card">
+        <!-- Alert Box -->
+        <div id="alert-box" class="alert alert-danger m-3" role="alert"></div>
+
+        <!-- Tabs -->
+        <ul class="nav nav-pills nav-justified" id="authTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login" type="button" role="tab">ĐĂNG NHẬP</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="register-tab" data-bs-toggle="pill" data-bs-target="#register" type="button" role="tab">ĐĂNG KÝ</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content p-4" id="authTabContent">
+
+            <!-- LOGIN FORM -->
+            <div class="tab-pane fade show active" id="login" role="tabpanel">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control with-icon" id="loginEmail" placeholder="Nhập email..." required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-bold">Mật khẩu</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control with-icon" id="loginPassword" placeholder="Nhập mật khẩu..." required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="btnLogin">
+                        <i class="fas fa-sign-in-alt me-2"></i>Đăng Nhập
+                    </button>
+                </form>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div class="tab-pane fade" id="register" role="tabpanel">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Họ và Tên</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-id-card text-muted"></i></span>
+                            <input type="text" class="form-control with-icon" id="regFullname" placeholder="Ví dụ: Thế Anh" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user text-muted"></i></span>
+                            <input type="text" class="form-control with-icon" id="regUsername" placeholder="Tên đăng nhập" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" class="form-control with-icon" id="regEmail" placeholder="duke@gmail.com" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-bold">Mật khẩu</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                            <input type="password" class="form-control with-icon" id="regPassword" placeholder="Tối thiểu 8 ký tự, có Hoa, Thường, Số, Ký tự ĐB" required>
+                        </div>
+                        <div class="form-text" style="font-size: 0.75rem;">Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (@$!%*?&).</div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100" id="btnRegister">
+                        <i class="fas fa-user-plus me-2"></i>Tạo Tài Khoản
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const BASE_URL = 'http://localhost:8080/api/v1/auth';
+
+    function showAlert(message, isSuccess = false) {
+        const alertBox = document.getElementById('alert-box');
+        alertBox.style.display = 'block';
+        alertBox.className = `alert m-3 ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+        alertBox.innerText = message;
+    }
+
+    // ================= XỬ LÝ ĐĂNG NHẬP =================
+    async function handleLogin(event) {
+        event.preventDefault(); // Ngăn form tự reload trang
+        const btn = document.getElementById('btnLogin');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+        btn.disabled = true;
+
+        const payload = {
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value
+        };
+
+        try {
+            const response = await fetch(`${BASE_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+               showAlert('Đăng nhập thành công! Đang chuyển hướng...', true);
+
+                    localStorage.setItem('ACCESS_TOKEN', data.accessToken);
+                    localStorage.setItem('USER_EMAIL', data.email);
+                    localStorage.setItem('USER_ROLE', data.role);
+
+                    setTimeout(() => {
+                        if (data.role === 'ROLE_ADMIN' || data.role === 'ADMIN') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'shop.html';
+                        }
+                    }, 1000);
+            } else {
+                showAlert(data.message || 'Sai tài khoản hoặc mật khẩu!');
+            }
+        } catch (error) {
+            showAlert('Không thể kết nối đến Server! Vui lòng kiểm tra lại Spring Boot.');
+        } finally {
+            btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Đăng Nhập';
+            btn.disabled = false;
+        }
+    }
+
+    // ================= XỬ LÝ ĐĂNG KÝ =================
+    async function handleRegister(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btnRegister');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang xử lý...';
+        btn.disabled = true;
+
+        const payload = {
+            fullname: document.getElementById('regFullname').value,
+            username: document.getElementById('regUsername').value,
+            email: document.getElementById('regEmail').value,
+            password: document.getElementById('regPassword').value
+        };
+
+        try {
+            const response = await fetch(`${BASE_URL}/customer-register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showAlert('Đăng ký thành công! Vui lòng đăng nhập.', true);
+                document.getElementById('registerForm').reset();
+                // Tự động chuyển về tab Đăng nhập
+                document.getElementById('login-tab').click();
+            } else {
+                // Xử lý lỗi validate từ Spring (Bad Request)
+                if(data.message) {
+                    showAlert(data.message);
+                } else if (data.errors) {
+                    // Nếu dùng @Valid nó hay trả về mảng errors
+                    showAlert('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại!');
+                } else {
+                    showAlert('Đăng ký thất bại!');
+                }
+            }
+        } catch (error) {
+            showAlert('Không thể kết nối đến Server!');
+        } finally {
+            btn.innerHTML = '<i class="fas fa-user-plus me-2"></i>Tạo Tài Khoản';
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

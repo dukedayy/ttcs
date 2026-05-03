@@ -34,4 +34,16 @@ public class FlashSale {
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "flashSale", orphanRemoval = true)
     private List<FlashSaleItem> flashSaleItemList = new ArrayList<>();
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(); // Lúc mới tạo thì update = create
+    }
+
+    // Tự động chạy ngay trước khi UPDATE dòng đã có
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

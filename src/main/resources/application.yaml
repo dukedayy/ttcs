@@ -20,9 +20,9 @@ spring:
 jwt:
   secret: a8e33b4cd23905e1cfdac93858f74db34770b55e2bcb95a7d70563fd54c16b0b
 
-aws:
-  region: ${AWS_REGION}
-  s3:
-    bucket-name: ${AWS_S3_BUCKET_NAME}
-  access-key-id: ${AWS_ACCESS_KEY_ID}
-  secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+
+application:
+  security:
+    jwt:
+      secret-key: 5e1cfdac9385a770b557058e33b4cd2390e2bcb95a7d8f74db3463fd54c16b0b
+      expiration: 86400000

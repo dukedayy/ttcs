@@ -28,6 +28,5 @@
         @Enumerated(EnumType.STRING)
         private ProductStatus status;
 
-        @NotBlank(message = "danh mục không được để trống")
         private String categoryId;
     }

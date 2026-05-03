@@ -46,7 +46,7 @@ public class Product {
     private ProductStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categoryId", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "categoryId", referencedColumnName = "id")
     private Category category;
 
     private Float averageScore;
@@ -55,6 +55,17 @@ public class Product {
     private boolean isOnFlashSale;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(); // Lúc mới tạo thì update = create
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

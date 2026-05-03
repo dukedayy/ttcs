@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - E-Commerce</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar { background-color: #1a2226; }
+        .nav-pills .nav-link { color: #495057; font-weight: 600; border-radius: 8px; margin-bottom: 5px; }
+        .nav-pills .nav-link.active { background-color: #3c8dbc; color: white; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        .img-thumbnail-sm { width: 50px; height: 50px; object-fit: cover; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark sticky-top p-3 mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-cogs me-2"></i>ADMIN CONTROL PANEL</a>
+        <div class="d-flex align-items-center">
+            <span class="text-light me-3" id="admin-greeting"></span>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    <div class="row">
+
+        <div class="col-md-3 col-lg-2 mb-4">
+            <div class="card p-2">
+                <ul class="nav nav-pills flex-column" id="adminTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active w-100 text-start" data-bs-toggle="pill" data-bs-target="#tab-category" type="button">
+                            <i class="fas fa-tags me-2"></i>Quản lý Danh mục
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link w-100 text-start mt-2" data-bs-toggle="pill" data-bs-target="#tab-product-list" type="button" onclick="fetchAdminProducts()">
+                            <i class="fas fa-list me-2"></i>DS Sản phẩm
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link w-100 text-start mt-2" data-bs-toggle="pill" data-bs-target="#tab-product" type="button">
+                            <i class="fas fa-box-open me-2"></i>Thêm Sản phẩm
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link w-100 text-start mt-2" data-bs-toggle="pill" data-bs-target="#tab-batch" type="button">
+                            <i class="fas fa-layer-group me-2"></i>Thêm Hàng loạt
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link w-100 text-start mt-2" data-bs-toggle="pill" data-bs-target="#tab-staff" type="button">
+                            <i class="fas fa-users-cog me-2"></i>Tạo Nhân viên
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link w-100 text-start mt-2" data-bs-toggle="pill" data-bs-target="#tab-marketing" type="button">
+                            <i class="fas fa-bullhorn me-2"></i>Marketing
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-9 col-lg-10">
+            <div class="tab-content" id="adminTabsContent">
+
+                <div class="tab-pane fade show active" id="tab-category">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="card p-4 mb-4">
+                                <h5 class="fw-bold mb-3">Tạo Danh Mục Mới</h5>
+                                <form onsubmit="createCategory(event)">
+                                    <div class="mb-3">
+                                        <input type="text" class="form-control" id="cat-name" placeholder="Tên danh mục..." required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100" id="btn-create-cat">Thêm Danh Mục</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="card p-4">
+                                <h5 class="fw-bold mb-3">Danh sách Danh Mục</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên danh mục</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="category-list"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-product-list">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3">Danh sách Sản Phẩm (Chi tiết)</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá bán</th>
+                                    <th>Tồn kho</th>
+                                    <th>Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="admin-product-list"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- ĐOẠN MỚI THÊM: Thanh Phân Trang -->
+                        <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-3">
+                            <span class="text-muted small fw-bold" id="page-info">Đang tải dữ liệu...</span>
+                            <nav>
+                                <ul class="pagination pagination-sm mb-0">
+                                    <li class="page-item" id="btn-prev-page">
+                                        <button class="page-link" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Trước</button>
+                                    </li>
+                                    <li class="page-item disabled">
+                                        <span class="page-link text-primary fw-bold" id="current-page-num">1</span>
+                                    </li>
+                                    <li class="page-item" id="btn-next-page">
+                                        <button class="page-link" onclick="changePage(1)">Sau <i class="fas fa-chevron-right"></i></button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <!-- KẾT THÚC ĐOẠN MỚI THÊM -->
+
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-product">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-4">Thêm Sản Phẩm Mới</h5>
+                        <form onsubmit="createProduct(event)">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Tên sản phẩm</label>
+                                    <input type="text" class="form-control" id="prod-name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Danh mục</label>
+                                    <select class="form-select" id="prod-category" required></select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Giá bán</label>
+                                    <input type="number" class="form-control" id="prod-price" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Giá vốn</label>
+                                    <input type="number" class="form-control" id="prod-cost">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Tồn kho</label>
+                                    <input type="number" class="form-control" id="prod-stock" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Khối lượng (kg)</label>
+                                    <input type="number" step="0.1" class="form-control" id="prod-weight">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Kích cỡ</label>
+                                    <input type="text" class="form-control" id="prod-sizes">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold small">Thuế (%)</label>
+                                    <input type="number" step="0.1" class="form-control" id="prod-tax" value="10">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small">Chọn Ảnh chính (từ máy tính)</label>
+                                    <input type="file" class="form-control" id="prod-file-upload" accept="image/*" onchange="generateImageUrl('prod-file-upload', 'prod-image', 'prod-image-preview')">
+
+                                    <input type="hidden" id="prod-image">
+                                    <small class="text-success fw-bold" id="prod-image-preview">URL sẽ lưu: (chưa chọn ảnh)</small>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small">Mô tả sản phẩm</label>
+                                    <textarea class="form-control" id="prod-desc" rows="3"></textarea>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-success px-5 py-2 fw-bold" id="btn-create-prod">
+                                        <i class="fas fa-save me-2"></i>LƯU SẢN PHẨM
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-batch">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3">Thêm Sản Phẩm Hàng Loạt (JSON)</h5>
+                        <form onsubmit="createBatchProducts(event)">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Dán mảng JSON chứa danh sách sản phẩm vào đây:</label>
+                                <textarea class="form-control text-monospace" id="batch-json" rows="10" placeholder='[{"name": "SP1", "price": 1000}, {"name": "SP2", "price": 2000}]' required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-warning fw-bold" id="btn-batch">
+                                <i class="fas fa-upload me-2"></i>THỰC THI BATCH
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-staff">
+                    <div class="card p-4 w-50">
+                        <h5 class="fw-bold mb-3">Tạo Tài Khoản Nhân Viên (Staff)</h5>
+                        <form onsubmit="createStaff(event)">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Họ tên</label>
+                                <input type="text" class="form-control" id="staff-fullname" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Username</label>
+                                <input type="text" class="form-control" id="staff-username" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small">Email</label>
+                                <input type="email" class="form-control" id="staff-email" required>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small">Mật khẩu</label>
+                                <input type="password" class="form-control" id="staff-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-info text-white fw-bold w-100" id="btn-staff">
+                                <i class="fas fa-user-plus me-2"></i>TẠO NHÂN VIÊN
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-marketing">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="card p-4">
+                                <h5 class="fw-bold mb-3 text-danger"><i class="fas fa-bolt me-2"></i>Tạo Flash Sale</h5>
+                                <form onsubmit="createFlashSale(event)">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold small">Thời gian bắt đầu</label>
+                                        <input type="datetime-local" class="form-control" id="fs-start" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold small">Thời gian kết thúc</label>
+                                        <input type="datetime-local" class="form-control" id="fs-end" required>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold small">Trạng thái</label>
+                                        <select class="form-select" id="fs-status">
+                                            <option value="UNACTIVE">UNACTIVE</option>
+                                            <option value="ACTIVE">ACTIVE</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger w-100 fw-bold" id="btn-fs">CHỐT FLASH SALE</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <div class="card p-4">
+                                <h5 class="fw-bold mb-3 text-success"><i class="fas fa-ticket-alt me-2"></i>Tạo Voucher Khuyến Mãi</h5>
+                                <form onsubmit="createVoucher(event)">
+                                    <div class="row g-2">
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-bold small">Mã Voucher</label>
+                                            <input type="text" class="form-control text-uppercase" id="vc-code" placeholder="VD: SUMMER20" required>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-bold small">Trạng thái</label>
+                                            <select class="form-select" id="vc-status">
+                                                <option value="ACTIVE">ACTIVE</option>
+                                                <option value="INACTIVE">INACTIVE</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-12 mb-2 mt-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="vc-use-percent">
+                                                <label class="form-check-label fw-bold text-primary">Giảm theo phần trăm (%)</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-bold small">% Giảm</label>
+                                            <input type="number" step="0.1" class="form-control" id="vc-percent" value="0">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-bold small">Tiền Giảm (VNĐ)</label>
+                                            <input type="number" class="form-control" id="vc-value" value="0">
+                                        </div>
+
+                                        <div class="col-md-6 mb-2 mt-3">
+                                            <label class="form-label fw-bold small">Đơn tối thiểu (VNĐ)</label>
+                                            <input type="number" class="form-control" id="vc-min-order" value="0">
+                                        </div>
+                                        <div class="col-md-6 mb-2 mt-3">
+                                            <label class="form-label fw-bold small">Giới hạn 1 User dùng</label>
+                                            <input type="number" class="form-control" id="vc-limit-user" value="1">
+                                        </div>
+
+                                        <div class="col-md-12 mb-2">
+                                            <label class="form-label fw-bold small">Tổng số lượt Voucher</label>
+                                            <input type="number" class="form-control" id="vc-usage-limit" value="9999">
+                                        </div>
+
+                                        <div class="col-md-6 mb-3 mt-3">
+                                            <label class="form-label fw-bold small">Bắt đầu</label>
+                                            <input type="datetime-local" class="form-control" id="vc-start" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3 mt-3">
+                                            <label class="form-label fw-bold small">Kết thúc</label>
+                                            <input type="datetime-local" class="form-control" id="vc-end" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100 fw-bold mt-2" id="btn-vc">PHÁT HÀNH VOUCHER</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Sửa Sản Phẩm</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form onsubmit="submitEditProduct(event)">
+                    <input type="hidden" id="edit-prod-id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Tên sản phẩm</label>
+                            <input type="text" class="form-control" id="edit-prod-name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small">Danh mục</label>
+                            <select class="form-select" id="edit-prod-category" required></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Giá bán</label>
+                            <input type="number" class="form-control" id="edit-prod-price" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Giá vốn</label>
+                            <input type="number" class="form-control" id="edit-prod-cost">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Tồn kho</label>
+                            <input type="number" class="form-control" id="edit-prod-stock" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Khối lượng (kg)</label>
+                            <input type="number" step="0.1" class="form-control" id="edit-prod-weight">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Kích cỡ</label>
+                            <input type="text" class="form-control" id="edit-prod-sizes">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small">Thuế (%)</label>
+                            <input type="number" step="0.1" class="form-control" id="edit-prod-tax">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small">Đổi Ảnh chính (để trống nếu giữ nguyên ảnh cũ)</label>
+                            <input type="file" class="form-control mb-2" id="edit-prod-file-upload" accept="image/*" onchange="generateImageUrl('edit-prod-file-upload', 'edit-prod-image')">
+                            <input type="text" class="form-control text-muted" id="edit-prod-image" readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold small">Mô tả sản phẩm</label>
+                            <textarea class="form-control" id="edit-prod-desc" rows="3"></textarea>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100 fw-bold" id="btn-update-prod">
+                                <i class="fas fa-check-circle me-2"></i>CẬP NHẬT
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const BASE_ADMIN_URL = 'http://localhost:8080/api/v1/admin';
+    const token = localStorage.getItem('ACCESS_TOKEN');
+    const role = localStorage.getItem('USER_ROLE');
+    let currentAdminProducts = [];
+    let editModalInstance;
+
+    window.onload = function() {
+        if (!token || (role !== 'ROLE_ADMIN' && role !== 'ADMIN')) {
+            alert('Bạn không có quyền truy cập trang này!');
+            window.location.href = 'auth.html';
+            return;
+        }
+        document.getElementById('admin-greeting').innerText = `Admin: ${localStorage.getItem('USER_EMAIL')}`;
+        editModalInstance = new bootstrap.Modal(document.getElementById('editProductModal'));
+        fetchCategories();
+    };
+
+    async function fetchCategories() {
+        try {
+            const response = await fetch(`${BASE_ADMIN_URL}/categories`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                renderCategoryTable(data);
+                renderCategorySelect(data);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    function renderCategoryTable(categories) {
+        document.getElementById('category-list').innerHTML = categories.map(cat => `
+            <tr>
+                <td class="small text-muted">${cat.id}</td>
+                <td class="fw-bold">${cat.name}</td>
+                <td><button class="btn btn-sm btn-outline-primary" onclick="renameCategory('${cat.id}')"><i class="fas fa-edit"></i></button></td>
+            </tr>
+        `).join('');
+    }
+
+    function renderCategorySelect(categories) {
+        const options = '<option value="">-- Chọn danh mục --</option>' + categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        document.getElementById('prod-category').innerHTML = options;
+        document.getElementById('edit-prod-category').innerHTML = options;
+    }
+
+    async function createCategory(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btn-create-cat');
+        btn.disabled = true;
+        try {
+            const response = await fetch(`${BASE_ADMIN_URL}/categories`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: document.getElementById('cat-name').value })
+            });
+            if (response.ok) {
+                alert('Tạo danh mục thành công!');
+                document.getElementById('cat-name').value = '';
+                fetchCategories();
+            } else alert('Lỗi tạo danh mục!');
+        } finally { btn.disabled = false; }
+    }
+
+    async function renameCategory(id) {
+        const newName = prompt("Nhập tên danh mục mới:");
+        if (!newName) return;
+        const response = await fetch(`${BASE_ADMIN_URL}/${id}/rename`, {
+            method: 'PUT',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newName: newName })
+        });
+        if (response.ok) { alert('Đổi tên thành công!'); fetchCategories(); }
+    }
+
+    async function createProduct(event) {
+        event.preventDefault();
+        const payload = {
+            name: document.getElementById('prod-name').value,
+            price: parseFloat(document.getElementById('prod-price').value),
+            costPrice: parseFloat(document.getElementById('prod-cost').value || 0),
+            stockQuantity: parseInt(document.getElementById('prod-stock').value),
+            weight: parseFloat(document.getElementById('prod-weight').value || 0),
+            sizes: document.getElementById('prod-sizes').value,
+            taxRate: parseFloat(document.getElementById('prod-tax').value || 0),
+            mainImageUrl: document.getElementById('prod-image').value,
+            description: document.getElementById('prod-desc').value,
+            categoryId: document.getElementById('prod-category').value
+        };
+        const response = await fetch(`${BASE_ADMIN_URL}/products`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (response.ok) { alert('Thêm sản phẩm thành công!'); event.target.reset(); }
+        else alert('Lỗi thêm sản phẩm');
+    }
+
+<!--    async function fetchAdminProducts() {-->
+<!--        const response = await fetch(`${BASE_ADMIN_URL}/product?page=0&size=50`, {-->
+<!--            headers: { 'Authorization': `Bearer ${token}` }-->
+<!--        });-->
+<!--        if (response.ok) {-->
+<!--            const data = await response.json();-->
+<!--            currentAdminProducts = data.content || [];-->
+<!--            document.getElementById('admin-product-list').innerHTML = currentAdminProducts.map(p => `-->
+<!--                <tr>-->
+<!--                    <td><img src="${p.mainImageUrl || 'https://via.placeholder.com/50'}" class="img-thumbnail-sm"></td>-->
+<!--                    <td class="fw-bold">${p.name}</td>-->
+<!--                    <td class="text-danger fw-bold">${p.price} ₫</td>-->
+<!--                    <td><span class="badge ${p.stockQuantity > 0 ? 'bg-success' : 'bg-danger'}">${p.stockQuantity}</span></td>-->
+<!--                    <td>-->
+<!--                        <button class="btn btn-sm btn-primary" onclick="openEditModal('${p.id}')"><i class="fas fa-edit"></i> Sửa</button>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            `).join('');-->
+<!--        }-->
+<!--    }-->
+        let currentPage = 0;
+        let totalPages = 0;
+        const PAGE_SIZE = 20;
+
+        // Hàm gọi API có truyền page
+        async function fetchAdminProducts(page = 0) {
+            currentPage = page;
+            const response = await fetch(`${BASE_ADMIN_URL}/product?page=${currentPage}&size=${PAGE_SIZE}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                currentAdminProducts = data.content || [];
+                totalPages = data.totalPages || 0;
+
+                // Render table
+                document.getElementById('admin-product-list').innerHTML = currentAdminProducts.map(p => `
+                    <tr>
+                        <td><img src="${p.mainImageUrl || 'https://via.placeholder.com/50'}" class="img-thumbnail-sm"></td>
+                        <td class="fw-bold">${p.name}</td>
+                        <td class="text-danger fw-bold">${p.price} ₫</td>
+                        <td><span class="badge ${p.stockQuantity > 0 ? 'bg-success' : 'bg-danger'}">${p.stockQuantity}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="openEditModal('${p.id}')"><i class="fas fa-edit"></i> Sửa</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Render UI Phân trang
+                document.getElementById('page-info').innerText =
+                    `Đang hiển thị trang ${currentPage + 1} / ${totalPages} (Tổng cộng: ${data.totalElements} sản phẩm)`;
+                document.getElementById('current-page-num').innerText = currentPage + 1;
+
+                // Tắt nút Trước nếu ở trang đầu, tắt nút Sau nếu ở trang cuối
+                document.getElementById('btn-prev-page').classList.toggle('disabled', currentPage === 0);
+                document.getElementById('btn-next-page').classList.toggle('disabled', currentPage >= totalPages - 1 || totalPages === 0);
+            }
+        }
+
+        // Hàm xử lý khi bấm nút Trước / Sau
+        function changePage(direction) {
+            const newPage = currentPage + direction;
+            if (newPage >= 0 && newPage < totalPages) {
+                fetchAdminProducts(newPage);
+            }
+        }
+
+    function openEditModal(id) {
+        const product = currentAdminProducts.find(p => p.id === id);
+        if (!product) return;
+
+        document.getElementById('edit-prod-id').value = product.id;
+        document.getElementById('edit-prod-name').value = product.name;
+        document.getElementById('edit-prod-category').value = product.categoryId || '';
+        document.getElementById('edit-prod-price').value = product.price;
+        document.getElementById('edit-prod-cost').value = product.costPrice || 0;
+        document.getElementById('edit-prod-stock').value = product.stockQuantity;
+        document.getElementById('edit-prod-weight').value = product.weight || 0;
+        document.getElementById('edit-prod-sizes').value = product.sizes || '';
+        document.getElementById('edit-prod-tax').value = product.taxRate || 0;
+        document.getElementById('edit-prod-image').value = product.mainImageUrl || '';
+        document.getElementById('edit-prod-desc').value = product.description || '';
+
+        editModalInstance.show();
+    }
+
+    async function submitEditProduct(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btn-update-prod');
+        btn.disabled = true;
+
+        const id = document.getElementById('edit-prod-id').value;
+        const payload = {
+            name: document.getElementById('edit-prod-name').value,
+            price: parseFloat(document.getElementById('edit-prod-price').value),
+            costPrice: parseFloat(document.getElementById('edit-prod-cost').value || 0),
+            stockQuantity: parseInt(document.getElementById('edit-prod-stock').value),
+            weight: parseFloat(document.getElementById('edit-prod-weight').value || 0),
+            sizes: document.getElementById('edit-prod-sizes').value,
+            taxRate: parseFloat(document.getElementById('edit-prod-tax').value || 0),
+            mainImageUrl: document.getElementById('edit-prod-image').value,
+            description: document.getElementById('edit-prod-desc').value,
+            categoryId: document.getElementById('edit-prod-category').value
+        };
+
+        try {
+            const response = await fetch(`${BASE_ADMIN_URL}/products/${id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('Cập nhật thành công!');
+                editModalInstance.hide();
+                fetchAdminProducts();
+            } else {
+                alert('Lỗi cập nhật sản phẩm');
+            }
+        } catch (e) {
+            alert('Lỗi kết nối');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function createBatchProducts(event) {
+        event.preventDefault();
+        try {
+            const payload = JSON.parse(document.getElementById('batch-json').value);
+            const response = await fetch(`${BASE_ADMIN_URL}/products/batch`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (response.ok) alert('Thêm danh sách sản phẩm thành công!');
+            else alert('Lỗi từ Server khi thêm batch');
+        } catch (e) { alert('Lỗi định dạng JSON!'); }
+    }
+
+    async function createStaff(event) {
+        event.preventDefault();
+        const payload = {
+            fullname: document.getElementById('staff-fullname').value,
+            username: document.getElementById('staff-username').value,
+            email: document.getElementById('staff-email').value,
+            password: document.getElementById('staff-password').value
+        };
+        const response = await fetch(`${BASE_ADMIN_URL}/users`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (response.ok) { alert('Tạo tài khoản nhân viên thành công!'); event.target.reset(); }
+    }
+
+    async function createFlashSale(event) {
+        event.preventDefault();
+        const payload = {
+            startTime: document.getElementById('fs-start').value,
+            endTime: document.getElementById('fs-end').value,
+            status: document.getElementById('fs-status').value
+        };
+        const response = await fetch(`${BASE_ADMIN_URL}/fs`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+            alert('Tạo Flash Sale thành công!');
+            event.target.reset();
+        } else {
+            const data = await response.json();
+            alert('Lỗi: ' + (data.message || JSON.stringify(data.errors)));
+        }
+    }
+
+    async function createVoucher(event) {
+        event.preventDefault();
+        const payload = {
+            voucherCode: document.getElementById('vc-code').value.toUpperCase(),
+            usePercentage: document.getElementById('vc-use-percent').checked,
+            discountPercentage: parseFloat(document.getElementById('vc-percent').value || 0),
+            discountValue: parseFloat(document.getElementById('vc-value').value || 0),
+            minOrderValue: parseInt(document.getElementById('vc-min-order').value || 0),
+            startDate: document.getElementById('vc-start').value,
+            endDate: document.getElementById('vc-end').value,
+            usageLimit: parseInt(document.getElementById('vc-usage-limit').value || 9999),
+            usedCount: 0,
+            limitPerUser: parseInt(document.getElementById('vc-limit-user').value || 1),
+            status: document.getElementById('vc-status').value
+        };
+        const response = await fetch(`${BASE_ADMIN_URL}/voucher`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (response.ok) {
+            alert('Tạo Voucher thành công!');
+            event.target.reset();
+        } else {
+            const data = await response.json();
+            alert('Lỗi: ' + (data.message || JSON.stringify(data.errors)));
+        }
+    }
+    function generateImageUrl(fileInputId, hiddenUrlInputId, previewTextId = null) {
+            const fileInput = document.getElementById(fileInputId);
+            const urlInput = document.getElementById(hiddenUrlInputId);
+
+            if (fileInput.files && fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                // Tự động ghép nối tạo link chuẩn
+                const localUrl = "./images/" + fileName;
+
+                urlInput.value = localUrl; // Gán vào ô dữ liệu gửi đi
+
+                // Nếu có thẻ text preview thì in ra cho dễ nhìn
+                if (previewTextId) {
+                    document.getElementById(previewTextId).innerText = "URL sẽ lưu: " + localUrl;
+                }
+            }
+        }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'auth.html';
+    }
+</script>
+</body>
+</html>
