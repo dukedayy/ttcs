@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/*.html", "/images/**").permitAll()
+                        .requestMatchers("/api/v1/staff/").hasAnyAuthority("ROLE_STAFF", "STAFF", "ROLE_ADMIN")
                         .requestMatchers("/api/v1/admin/users/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/customer/product/**").permitAll()
                         .anyRequest().authenticated()

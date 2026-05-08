@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal - Vận Hành Hệ Thống</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        .navbar { background-color: #2c3e50; }
+        .nav-pills .nav-link { color: #495057; font-weight: 600; border-radius: 8px; margin-bottom: 5px; }
+        .nav-pills .nav-link.active { background-color: #18bc9c; color: white; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.05); }
+        .img-thumbnail-sm { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+
+        /* Bảng màu Trạng thái Đơn hàng */
+        .status-PENDING { background-color: #f1c40f; color: #fff; }
+        .status-CONFIRMED, .status-PROCESSING { background-color: #3498db; color: #fff; }
+        .status-SHIPPING { background-color: #9b59b6; color: #fff; }
+        .status-DELIVERED, .status-COMPLETED { background-color: #2ecc71; color: #fff; }
+        .status-CANCELLED, .status-DENIED { background-color: #e74c3c; color: #fff; }
+        .status-RETURNED, .status-REFUNDED, .status-RETURN_REQUESTED { background-color: #e67e22; color: #fff; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark sticky-top p-3 mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#"><i class="fas fa-boxes me-2"></i>STAFF PORTAL</a>
+        <div class="d-flex align-items-center">
+            <span class="text-light me-3 fw-bold" id="staff-greeting"></span>
+            <button class="btn btn-outline-light btn-sm rounded-pill px-3" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 mb-4">
+            <div class="card p-2 h-100">
+                <ul class="nav nav-pills flex-column" id="staffTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active w-100 text-start" data-bs-toggle="pill" data-bs-target="#tab-orders" type="button" onclick="fetchOrders(0)">
+                            <i class="fas fa-clipboard-list me-2"></i>Quản lý Đơn hàng
+                        </button>
+                    </li>
+                    <li class="nav-item mt-2">
+                        <button class="nav-link w-100 text-start" data-bs-toggle="pill" data-bs-target="#tab-inventory" type="button" onclick="fetchInventory(0)">
+                            <i class="fas fa-warehouse me-2"></i>Quản lý Tồn kho
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-9 col-lg-10">
+            <div class="tab-content" id="staffTabsContent">
+
+                <div class="tab-pane fade show active" id="tab-orders">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-4 border-bottom pb-2 text-primary">Danh sách Đơn hàng</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Khách hàng</th>
+                                    <th>SĐT</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái hiện tại</th>
+                                    <th>Cập nhật trạng thái</th>
+                                </tr>
+                                </thead>
+                                <tbody id="order-list">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <span class="text-muted small fw-bold" id="order-page-info"></span>
+                            <nav><ul class="pagination pagination-sm mb-0" id="order-pagination-ul"></ul></nav>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="tab-inventory">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-4 border-bottom pb-2 text-success">Cập nhật Tồn kho Sản phẩm</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá bán</th>
+                                    <th style="width: 200px;">Tồn kho hiện tại</th>
+                                    <th>Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody id="inventory-list">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                            <span class="text-muted small fw-bold" id="inv-page-info"></span>
+                            <nav><ul class="pagination pagination-sm mb-0" id="inv-pagination-ul"></ul></nav>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="toast-msg">Thành công!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const BASE_URL = 'http://localhost:8080/api/v1/staff';
+    const token = localStorage.getItem('ACCESS_TOKEN');
+    const role = localStorage.getItem('USER_ROLE');
+
+    // Mảng trạng thái chuẩn
+    const STATUSES = [
+        "PENDING", "CONFIRMED", "DENIED", "PROCESSING", "SHIPPING",
+        "DELIVERED", "COMPLETED", "CANCELLED", "RETURNED", "REFUNDED", "RETURN_REQUESTED"
+    ];
+
+    let currentOrderPage = 0, totalOrderPages = 0;
+    let currentInvPage = 0, totalInvPages = 0;
+    const PAGE_SIZE = 10;
+
+    window.onload = function() {
+        // Tạo một danh sách các Role được phép vào trang này (bao gồm cả Admin đi tuần tra)
+        const validRoles = ['STAFF', 'ROLE_STAFF', 'SALES_STAFF', 'ROLE_SALES_STAFF', 'ADMIN', 'ROLE_ADMIN'];
+
+        // Nếu không có token HOẶC role không nằm trong danh sách trên -> Đuổi ra
+        if (!token || !validRoles.includes(role)) {
+            alert('Bạn không có quyền truy cập trang Staff!');
+            window.location.href = 'auth.html';
+            return;
+        }
+
+        // Nếu lọt qua được cửa thì cho hiển thị lời chào và tải danh sách đơn hàng
+        document.getElementById('staff-greeting').innerText = `Nhân viên: ${localStorage.getItem('USER_EMAIL')}`;
+        fetchOrders(0);
+    };
+
+    /* ===================== LOGIC QUẢN LÝ ĐƠN HÀNG ===================== */
+    async function fetchOrders(page = 0) {
+        currentOrderPage = page;
+        try {
+            const response = await fetch(`${BASE_URL}/orders?page=${page}&size=${PAGE_SIZE}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                totalOrderPages = data.totalPages;
+                renderOrders(data.content);
+                renderPagination(totalOrderPages, currentOrderPage, 'order-pagination-ul', 'order-page-info', 'fetchOrders');
+            }
+        } catch (e) { console.error("Lỗi tải đơn hàng"); }
+    }
+
+    function renderOrders(orders) {
+        document.getElementById('order-list').innerHTML = orders.map(o => `
+            <tr>
+                <td class="fw-bold text-muted">#${o.id.substring(0,8)}</td>
+                <td class="fw-bold">${o.receiverName}</td>
+                <td>${o.receiverPhone}</td>
+                <td class="text-danger fw-bold">${o.totalAmount.toLocaleString('vi-VN')} ₫</td>
+                <td><span class="badge status-${o.status} px-3 py-2">${o.status}</span></td>
+                <td>
+                    <div class="input-group input-group-sm">
+                        <select class="form-select fw-bold" id="status-select-${o.id}">
+                            ${STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
+                        </select>
+                        <button class="btn btn-primary" onclick="updateOrderStatus('${o.id}')">
+                            <i class="fas fa-save"></i> Lưu
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function updateOrderStatus(orderId) {
+        const newStatus = document.getElementById(`status-select-${orderId}`).value;
+        try {
+            const res = await fetch(`${BASE_URL}/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            });
+            if (res.ok) {
+                showToast('Cập nhật trạng thái thành công!', true);
+                fetchOrders(currentOrderPage);
+            } else showToast('Lỗi cập nhật', false);
+        } catch (e) { showToast('Lỗi server', false); }
+    }
+
+    /* ===================== LOGIC QUẢN LÝ TỒN KHO ===================== */
+    async function fetchInventory(page = 0) {
+        currentInvPage = page;
+        try {
+            const response = await fetch(`${BASE_URL}/products?page=${page}&size=${PAGE_SIZE}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                totalInvPages = data.totalPages;
+                renderInventory(data.content);
+                renderPagination(totalInvPages, currentInvPage, 'inv-pagination-ul', 'inv-page-info', 'fetchInventory');
+            }
+        } catch (e) { console.error("Lỗi tải tồn kho"); }
+    }
+
+    function renderInventory(products) {
+        document.getElementById('inventory-list').innerHTML = products.map(p => `
+            <tr>
+                <td><img src="${p.mainImageUrl || 'https://via.placeholder.com/50'}" class="img-thumbnail-sm"></td>
+                <td class="fw-bold">${p.name}</td>
+                <td class="text-muted">${p.price.toLocaleString('vi-VN')} ₫</td>
+                <td>
+                    <input type="number" class="form-control text-center fw-bold ${p.stockQuantity <= 5 ? 'text-danger border-danger' : 'text-success'}"
+                           id="stock-${p.id}" value="${p.stockQuantity}" min="0">
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-success fw-bold px-3" onclick="updateStock('${p.id}')">
+                        <i class="fas fa-check me-1"></i> Cập nhật
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async function updateStock(productId) {
+        const newQty = document.getElementById(`stock-${productId}`).value;
+        try {
+            const res = await fetch(`${BASE_URL}/products/${productId}/stock`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ stockQuantity: parseInt(newQty) })
+            });
+            if (res.ok) {
+                showToast('Đã lưu tồn kho!', true);
+                fetchInventory(currentInvPage); // Refresh to get correct colors
+            } else showToast('Lỗi cập nhật', false);
+        } catch (e) { showToast('Lỗi server', false); }
+    }
+
+    /* ===================== TIỆN ÍCH ===================== */
+    function renderPagination(total, current, ulId, infoId, functionName) {
+        document.getElementById(infoId).innerText = total > 0 ? `Trang ${current + 1} / ${total}` : 'Không có dữ liệu';
+        const ul = document.getElementById(ulId);
+        if (total <= 0) { ul.innerHTML = ''; return; }
+
+        let html = `<li class="page-item ${current === 0 ? 'disabled' : ''}">
+            <button class="page-link" onclick="${functionName}(${current - 1})">Trước</button></li>`;
+
+        let start = Math.max(0, current - 2);
+        let end = Math.min(total - 1, current + 2);
+
+        for (let i = start; i <= end; i++) {
+            html += `<li class="page-item ${i === current ? 'active' : ''}">
+                <button class="page-link" onclick="${functionName}(${i})">${i + 1}</button></li>`;
+        }
+
+        html += `<li class="page-item ${current >= total - 1 ? 'disabled' : ''}">
+            <button class="page-link" onclick="${functionName}(${current + 1})">Sau</button></li>`;
+        ul.innerHTML = html;
+    }
+
+    function showToast(message, isSuccess) {
+        const toastEl = document.getElementById('liveToast');
+        toastEl.className = `toast align-items-center text-white border-0 ${isSuccess ? 'bg-success' : 'bg-danger'}`;
+        document.getElementById('toast-msg').innerText = message;
+        new bootstrap.Toast(toastEl).show();
+    }
+
+    function logout() {
+        localStorage.clear();
+        window.location.href = 'auth.html';
+    }
+</script>
+</body>
+</html>

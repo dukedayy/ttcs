@@ -2,13 +2,11 @@ package com.ttcs.ttcs_app.controller;
 
 import com.ttcs.ttcs_app.dto.request.AddToCartRequest;
 import com.ttcs.ttcs_app.dto.request.OrderRequest;
-import com.ttcs.ttcs_app.dto.response.ApiResponse;
-import com.ttcs.ttcs_app.dto.response.CartResponse;
-import com.ttcs.ttcs_app.dto.response.OrderResponse;
-import com.ttcs.ttcs_app.dto.response.ProductResponse;
+import com.ttcs.ttcs_app.dto.response.*;
 import com.ttcs.ttcs_app.service.AdminService;
 import com.ttcs.ttcs_app.service.CustomerService;
 import com.ttcs.ttcs_app.service.OrderService;
+import com.ttcs.ttcs_app.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,12 +23,22 @@ public class CustomerController {
     private final AdminService adminService;
     private final CustomerService customerService;
     private final OrderService orderService;
+    private final ProductService productService;
+
     @GetMapping("/product")
     public ResponseEntity<Page<ProductResponse>> getSimpledProductPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ){
         Page<ProductResponse> result = customerService.getSimpledProductPaged(page, size);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<ProductDetailedResponse> viewProductDetailed(
+            @PathVariable("productId") String productId
+    ){
+        ProductDetailedResponse result = productService.viewProductDetailed(productId);
         return ResponseEntity.ok(result);
     }
 

@@ -175,8 +175,13 @@ public class CustomerService {
             throw new RuntimeException("Tài khoản này không có hồ sơ Customer");
         }
 
-        Cart cart = cartRepository.findByCustomer(customer)
-                .orElseGet(() -> cartRepository.save(Cart.builder().customer(customer).build()));
+        Cart cart = cartRepository.findByCustomer(customer).orElse(null);
+        if (cart == null) {
+            cart = Cart.builder().customer(customer).build();
+            cart = cartRepository.save(cart);
+            customer.setCart(cart);
+            userRepository.save(user);
+        }
 
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));

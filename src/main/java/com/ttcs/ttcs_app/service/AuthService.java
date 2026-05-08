@@ -65,10 +65,11 @@ public class AuthService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .fullname(request.getFullname())
-                .role(request.getRole().equals("Staff") ? Role.STAFF : Role.SALES_STAFF)
+                .role(request.getRole().equalsIgnoreCase("Staff") ? Role.STAFF : Role.SALES_STAFF)
                 .status(Status.ACTIVE)
                 .build();
         userRepository.save(user);
+        System.out.println("Đăng ký staff oke");
         return "Đăng ký tài khoản " + request.getRole() + " thành công!";
     }
 

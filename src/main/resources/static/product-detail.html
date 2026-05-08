@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm - Duke Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --danger-color: #EF4444;
+            --bg-light: #F3F4F6;
+        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); color: #1F2937; }
+        .navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .product-gallery-main { width: 100%; border-radius: 16px; object-fit: contain; background: #fff; max-height: 500px; padding: 1rem; border: 1px solid #E5E7EB; }
+        .thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; background: #fff; }
+        .thumbnail:hover, .thumbnail.active { border-color: var(--primary-color); }
+        .price-sale { color: var(--danger-color); font-size: 2rem; font-weight: 800; }
+        .price-original { text-decoration: line-through; color: #9CA3AF; font-size: 1.25rem; font-weight: 500; }
+        .stat-item { font-size: 0.9rem; color: #4B5563; border-right: 1px solid #E5E7EB; padding-right: 1rem; margin-right: 1rem; }
+        .stat-item:last-child { border: none; }
+        .size-badge { border: 1px solid #D1D5DB; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .size-badge:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        .btn-add-cart { background-color: #E0E7FF; color: var(--primary-color); font-weight: 700; border: none; padding: 14px; border-radius: 12px; }
+        .btn-add-cart:hover { background-color: var(--primary-color); color: white; }
+        .btn-buy-now { background-color: var(--danger-color); color: white; font-weight: 700; border: none; padding: 14px; border-radius: 12px; }
+        .btn-buy-now:hover { background-color: #DC2626; color: white; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="shop.html"><i class="fas fa-layer-group me-2"></i>DUKE.POS</a>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <a href="cart.html" class="btn btn-light rounded-circle p-2 shadow-sm"><i class="fas fa-shopping-bag fs-5"></i></a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4 mb-5 pb-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="shop.html" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chi tiết sản phẩm</li>
+        </ol>
+    </nav>
+
+    <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+    </div>
+
+    <div class="row g-5" id="product-content" style="display: none;">
+        <div class="col-md-5">
+            <img id="main-image" src="" class="product-gallery-main shadow-sm mb-3">
+            <div class="d-flex gap-2 flex-wrap" id="thumbnail-container">
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div id="flash-sale-badge" class="badge bg-danger mb-2 p-2 fs-6 d-none"><i class="fas fa-bolt me-1"></i> FLASH SALE</div>
+            <h2 id="pd-name" class="fw-bold mb-3"></h2>
+
+            <div class="d-flex align-items-center mb-3">
+                <div class="text-warning me-2 fw-bold"><i class="fas fa-star"></i> <span id="pd-score">0</span></div>
+                <div class="stat-item"><span id="pd-reviews" class="fw-bold">0</span> Đánh giá</div>
+                <div class="stat-item"><span id="pd-views" class="fw-bold">0</span> Lượt xem</div>
+                <div class="stat-item text-danger"><i class="fas fa-heart"></i> <span id="pd-likes">0</span></div>
+            </div>
+
+            <div class="p-4 rounded-4 mb-4" style="background-color: #fff; border: 1px solid #E5E7EB;">
+                <div id="price-container">
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-4 text-muted fw-semibold">Kho hàng</div>
+                <div class="col-8 fw-bold" id="pd-stock"></div>
+            </div>
+
+            <div class="row mb-4" id="sizes-row" style="display: none;">
+                <div class="col-4 text-muted fw-semibold">Phân loại</div>
+                <div class="col-8 d-flex gap-2 flex-wrap" id="pd-sizes"></div>
+            </div>
+
+            <div class="row mb-4 align-items-center">
+                <div class="col-4 text-muted fw-semibold">Số lượng</div>
+                <div class="col-8">
+                    <input type="number" id="qty-input" class="form-control text-center fw-bold" value="1" min="1" style="width: 100px;">
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-5">
+                <button class="btn btn-add-cart flex-fill" onclick="handleAddToCart()"><i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng</button>
+                <button class="btn btn-buy-now flex-fill" onclick="handleBuyNow()">MUA NGAY</button>
+            </div>
+
+            <hr class="my-5">
+            <h5 class="fw-bold mb-3">Mô tả sản phẩm</h5>
+            <div id="pd-description" class="text-muted" style="line-height: 1.8;"></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body fw-semibold" id="toast-msg">Thành công!</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const BASE_URL = 'http://localhost:8080/api/v1/customer';
+    let token = localStorage.getItem('ACCESS_TOKEN');
+    let currentProduct = null;
+    
+    // 1. Lấy ID sản phẩm từ URL (Ví dụ: ?id=123-abc)
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    // Biến lưu thời gian bắt đầu xem (Cho Hệ thống Gợi ý)
+    let viewStartTime = Date.now();
+
+    window.onload = function() {
+        if (!token) { window.location.href = 'auth.html'; return; }
+        if (!productId) { window.location.href = 'shop.html'; return; }
+        fetchProductDetail();
+    };
+
+    async function fetchProductDetail() {
+        try {
+            const response = await fetch(`${BASE_URL}/product/${productId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                currentProduct = await response.json();
+                renderDetail(currentProduct);
+            } else {
+                alert("Sản phẩm không tồn tại!");
+                window.location.href = 'shop.html';
+            }
+        } catch (error) {
+            console.error("Lỗi:", error);
+            document.getElementById('loading').innerHTML = '<p class="text-danger fw-bold">Lỗi kết nối!</p>';
+        }
+    }
+
+    function renderDetail(p) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('product-content').style.display = 'flex';
+
+        // Thông tin cơ bản
+        document.getElementById('pd-name').innerText = p.name;
+        document.getElementById('pd-score').innerText = p.averageScore ? p.averageScore.toFixed(1) : '5.0';
+        document.getElementById('pd-reviews').innerText = p.reviewCount || 0;
+        document.getElementById('pd-views').innerText = p.views || 0;
+        document.getElementById('pd-likes').innerText = p.likeCounts || 0;
+        document.getElementById('pd-stock').innerText = p.stockQuantity > 0 ? p.stockQuantity : 'Hết hàng';
+        document.getElementById('pd-description').innerHTML = p.description ? p.description.replace(/\n/g, '<br>') : 'Đang cập nhật...';
+
+        document.getElementById('qty-input').max = p.stockQuantity;
+        if(p.stockQuantity === 0) document.getElementById('qty-input').disabled = true;
+
+        // Xử lý Giá & Flash Sale
+        const priceContainer = document.getElementById('price-container');
+        if (p.isOnFlashSale && p.flashSalePrice) {
+            document.getElementById('flash-sale-badge').classList.remove('d-none');
+            priceContainer.innerHTML = `
+                <span class="price-sale me-3">${formatCurrency(p.flashSalePrice)}</span>
+                <span class="price-original">${formatCurrency(p.price)}</span>
+            `;
+        } else {
+            priceContainer.innerHTML = `<span class="price-sale">${formatCurrency(p.price)}</span>`;
+        }
+
+        // Xử lý Sizes
+        if (p.sizes) {
+            document.getElementById('sizes-row').style.display = 'flex';
+            const sizesArr = p.sizes.split(',').map(s => s.trim());
+            document.getElementById('pd-sizes').innerHTML = sizesArr.map(s => `<div class="size-badge">${s}</div>`).join('');
+        }
+
+        // Xử lý Hình ảnh (Ảnh chính + Ảnh phụ)
+        document.getElementById('main-image').src = p.mainImageUrl || 'https://via.placeholder.com/500';
+        
+        let allImages = [p.mainImageUrl];
+        if (p.imagesUrl) {
+            allImages = allImages.concat(p.imagesUrl.split(',').map(i => i.trim()));
+        }
+        
+        // Render Thumbnails
+        document.getElementById('thumbnail-container').innerHTML = allImages.map((img, idx) => `
+            <img src="${img}" class="thumbnail ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${img}', this)">
+        `).join('');
+    }
+
+    function changeMainImage(src, element) {
+        document.getElementById('main-image').src = src;
+        document.querySelectorAll('.thumbnail').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    async function handleAddToCart() {
+        const qty = parseInt(document.getElementById('qty-input').value);
+        if (qty > currentProduct.stockQuantity) {
+            showToast('Vượt quá số lượng tồn kho!', false); return;
+        }
+
+        try {
+            const response = await fetch(`${BASE_URL}/add-to-cart`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: productId, quantity: qty })
+            });
+            if (response.ok) {
+                showToast(`Đã thêm ${qty} sản phẩm vào giỏ!`, true);
+                trackUserActivity(productId, 'ADD_TO_CART'); // LOG: Thêm giỏ hàng
+            }
+        } catch (e) { showToast('Lỗi máy chủ', false); }
+    }
+
+    function handleBuyNow() {
+        // Có thể chuyển hướng sang trang thanh toán riêng, hoặc tái sử dụng Modal.
+        // Ở đây đơn giản nhất là bắn log BUY và báo thành công cho luồng giả lập.
+        trackUserActivity(productId, 'BUY'); 
+        alert("Chức năng thanh toán nhanh đang được tích hợp!");
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    }
+
+    function showToast(message, isSuccess) {
+        const toastEl = document.getElementById('liveToast');
+        toastEl.className = `toast align-items-center text-white border-0 ${isSuccess ? 'bg-success' : 'bg-danger'}`;
+        document.getElementById('toast-msg').innerText = message;
+        new bootstrap.Toast(toastEl).show();
+    }
+
+    // --------------------------------------------------------
+    // MÁY NGHE LÉN ĐỈNH CAO: BẮT SỰ KIỆN KHÁCH HÀNG TẮT TRANG
+    // --------------------------------------------------------
+    function trackUserActivity(pId, actionType, stayTime = 0) {
+        if (!token) return;
+        fetch('http://localhost:8080/api/v1/customer/activity-logs', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: pId, action: actionType, stayTime: stayTime }),
+            keepalive: true
+        }).catch(e => console.log(e));
+    }
+
+    // Khi khách hàng đóng tab, tải lại trang, hoặc bấm quay lại shop.html
+    window.addEventListener('beforeunload', function (e) {
+        if (productId && viewStartTime > 0) {
+            const stayTimeInSeconds = (Date.now() - viewStartTime) / 1000;
+            // Bắn log VIEW về Server ngầm ở giây phút cuối cùng!
+            trackUserActivity(productId, 'VIEW', stayTimeInSeconds);
+        }
+    });
+
+</script>
+</body>
+</html>

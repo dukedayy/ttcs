@@ -185,7 +185,10 @@
                     setTimeout(() => {
                         if (data.role === 'ROLE_ADMIN' || data.role === 'ADMIN') {
                             window.location.href = 'admin.html';
-                        } else {
+                        } else if (data.role === 'ROLE_STAFF' || data.role === 'STAFF') {
+                            window.location.href = 'staff.html';
+                        }
+                        else {
                             window.location.href = 'shop.html';
                         }
                     }, 1000);

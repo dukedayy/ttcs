@@ -220,7 +220,7 @@
 
                 <div class="tab-pane fade" id="tab-staff">
                     <div class="card p-4 w-50">
-                        <h5 class="fw-bold mb-3">Tạo Tài Khoản Nhân Viên (Staff)</h5>
+                        <h5 class="fw-bold mb-3">Tạo Tài Khoản Nhân Viên</h5>
                         <form onsubmit="createStaff(event)">
                             <div class="mb-3">
                                 <label class="form-label fw-bold small">Họ tên</label>
@@ -234,10 +234,19 @@
                                 <label class="form-label fw-bold small">Email</label>
                                 <input type="email" class="form-control" id="staff-email" required>
                             </div>
-                            <div class="mb-4">
+                            <div class="mb-3">
                                 <label class="form-label fw-bold small">Mật khẩu</label>
                                 <input type="password" class="form-control" id="staff-password" required>
                             </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-bold small">Chức vụ (Role)</label>
+                                <select class="form-select" id="staff-role" required>
+                                    <option value="STAFF">Nhân viên Vận hành (Staff)</option>
+                                    <option value="SALE_STAFF">Nhân viên Bán hàng (Sale Staff)</option>
+                                </select>
+                            </div>
+
                             <button type="submit" class="btn btn-info text-white fw-bold w-100" id="btn-staff">
                                 <i class="fas fa-user-plus me-2"></i>TẠO NHÂN VIÊN
                             </button>
@@ -652,7 +661,8 @@
             fullname: document.getElementById('staff-fullname').value,
             username: document.getElementById('staff-username').value,
             email: document.getElementById('staff-email').value,
-            password: document.getElementById('staff-password').value
+            password: document.getElementById('staff-password').value,
+            role: document.getElementById('staff-role').value
         };
         const response = await fetch(`${BASE_ADMIN_URL}/users`, {
             method: 'POST',

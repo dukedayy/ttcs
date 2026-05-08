@@ -53,6 +53,7 @@ public class Product {
     private Integer views;
     private Integer likeCounts;
     private boolean isOnFlashSale;
+    private Integer reviewCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
