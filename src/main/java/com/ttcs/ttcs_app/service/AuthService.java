@@ -91,6 +91,7 @@ public class AuthService {
                 .accessToken(jwtToken)
                 .email(user.getEmail())
                 .role(String.valueOf(user.getRole()))
+                .userId(user.getId())
                 .build();
     }
 

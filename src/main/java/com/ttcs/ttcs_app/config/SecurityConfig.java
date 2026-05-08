@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/chat/**").permitAll()
                         .requestMatchers("/*.html", "/images/**").permitAll()
                         .requestMatchers("/api/v1/staff/").hasAnyAuthority("ROLE_STAFF", "STAFF", "ROLE_ADMIN")
                         .requestMatchers("/api/v1/admin/users/**").hasAuthority("ROLE_ADMIN")
