@@ -1,5 +1,6 @@
 package com.ttcs.ttcs_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,10 +22,12 @@ public class Order {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customerId", referencedColumnName = "userId", nullable = false)
+    @JsonIgnore
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "staffId", referencedColumnName = "id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,10 +62,9 @@ public class Order {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now(); // Lúc mới tạo thì update = create
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // Tự động chạy ngay trước khi UPDATE dòng đã có
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
