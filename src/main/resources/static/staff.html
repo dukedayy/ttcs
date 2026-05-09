@@ -159,56 +159,285 @@
     };
 
     /* ===================== LOGIC QUẢN LÝ ĐƠN HÀNG ===================== */
+<!--    async function fetchOrders(page = 0) {-->
+<!--    currentOrderPage = page;-->
+<!--    try {-->
+<!--        console.log(`Đang gọi API tới: ${BASE_URL}/orders?page=${page}&size=${PAGE_SIZE}`);-->
+
+<!--        const response = await fetch(`${BASE_URL}/orders?page=${page}&size=${PAGE_SIZE}`, {-->
+<!--            method: 'GET',-->
+<!--            headers: {-->
+<!--                'Authorization': `Bearer ${token}`,-->
+<!--                'Content-Type': 'application/json'-->
+<!--            }-->
+<!--        });-->
+
+<!--        if (response.ok) {-->
+<!--            const data = await response.json();-->
+<!--            console.log("Dữ liệu đơn hàng lấy về:", data); // Check xem content có rỗng không-->
+
+<!--            totalOrderPages = data.totalPages || 0;-->
+<!--            renderOrders(data.content || []);-->
+<!--            renderPagination(totalOrderPages, currentOrderPage, 'order-pagination-ul', 'order-page-info', 'fetchOrders');-->
+<!--        } else {-->
+<!--            // NẾU BỊ LỖI THÌ NÓ SẼ BÁO Ở ĐÂY-->
+<!--            const errorData = await response.text();-->
+<!--            console.error(`Lỗi API! Status: ${response.status} - Message:`, errorData);-->
+<!--            alert(`Không lấy được dữ liệu. Lỗi mã: ${response.status}`);-->
+<!--        }-->
+<!--    } catch (e) {-->
+<!--        console.error("Lỗi sập mạng hoặc không kết nối được Server:", e);-->
+<!--    }-->
+<!--}-->
+
+<!--    function renderOrders(orders) {-->
+<!--    const tableBody = document.getElementById('order-list');-->
+<!--    tableBody.innerHTML = '';-->
+
+<!--    orders.forEach(order => {-->
+<!--        // "Phẫu thuật" chuỗi: "Địa chỉ | Tên | SĐT"-->
+<!--        // Dùng .map(s => s.trim()) để xóa khoảng trắng thừa cho đẹp-->
+<!--        const addressParts = order.shippingAddress ? order.shippingAddress.split('|').map(item => item.trim()) : [];-->
+
+<!--        const address = addressParts[0] || 'N/A';-->
+<!--        const customerName = addressParts[1] || 'Khách vãng lai';-->
+<!--        const phone = addressParts[2] || 'Không có số';-->
+
+<!--        const row = `-->
+<!--            <tr>-->
+<!--                <td>${order.orderCode}</td>-->
+<!--                <td>${customerName}</td>-->
+<!--                <td>${phone}</td>-->
+<!--                <td>${address}</td>-->
+<!--                <td>${new Date(order.createdAt).toLocaleString('vi-VN')}</td>-->
+<!--&lt;!&ndash;                <td>${formatCurrency(order.finalAmount)}</td>&ndash;&gt;-->
+<!--                <td><span class="badge ${getStatusClass(order.status)}">${order.status}</span></td>-->
+<!--                <td>-->
+<!--                    <button class="btn btn-sm btn-info" onclick="viewDetail('${order.id}')">Chi tiết</button>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--        `;-->
+<!--        tableBody.insertAdjacentHTML('beforeend', row);-->
+<!--    });-->
+<!--}-->
+
+<!--    function formatCurrency(amount) {-->
+<!--        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);-->
+<!--    }-->
+
+<!--&lt;!&ndash;    function renderOrders(orders) {&ndash;&gt;-->
+<!--&lt;!&ndash;        document.getElementById('order-list').innerHTML = orders.map(o => `&ndash;&gt;-->
+<!--&lt;!&ndash;            <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                <td class="fw-bold text-muted">#${o.id.substring(0,8)}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;                <td class="fw-bold">${o.receiverName}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;                <td>${o.receiverPhone}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;                <td class="text-danger fw-bold">${o.totalAmount.toLocaleString('vi-VN')} ₫</td>&ndash;&gt;-->
+<!--&lt;!&ndash;                <td><span class="badge status-${o.status} px-3 py-2">${o.status}</span></td>&ndash;&gt;-->
+<!--&lt;!&ndash;                <td>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <div class="input-group input-group-sm">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <select class="form-select fw-bold" id="status-select-${o.id}">&ndash;&gt;-->
+<!--&lt;!&ndash;                            ${STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}&ndash;&gt;-->
+<!--&lt;!&ndash;                        </select>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <button class="btn btn-primary" onclick="updateOrderStatus('${o.id}')">&ndash;&gt;-->
+<!--&lt;!&ndash;                            <i class="fas fa-save"></i> Lưu&ndash;&gt;-->
+<!--&lt;!&ndash;                        </button>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;                </td>&ndash;&gt;-->
+<!--&lt;!&ndash;            </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;        `).join('');&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+
+<!--    async function updateOrderStatus(orderId) {-->
+<!--        const newStatus = document.getElementById(`status-select-${orderId}`).value;-->
+<!--        try {-->
+<!--            const res = await fetch(`${BASE_URL}/orders/${orderId}/status`, {-->
+<!--                method: 'PUT',-->
+<!--                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },-->
+<!--                body: JSON.stringify({ status: newStatus })-->
+<!--            });-->
+<!--            if (res.ok) {-->
+<!--                showToast('Cập nhật trạng thái thành công!', true);-->
+<!--                fetchOrders(currentOrderPage);-->
+<!--            } else showToast('Lỗi cập nhật', false);-->
+<!--        } catch (e) { showToast('Lỗi server', false); }-->
+<!--    }-->
+
+<!--    /* ===================== LOGIC QUẢN LÝ TỒN KHO ===================== */-->
+<!--    async function fetchInventory(page = 0) {-->
+<!--        currentInvPage = page;-->
+<!--        try {-->
+<!--            const response = await fetch(`${BASE_URL}/products?page=${page}&size=${PAGE_SIZE}`, {-->
+<!--                headers: { 'Authorization': `Bearer ${token}` }-->
+<!--            });-->
+<!--            if (response.ok) {-->
+<!--                const data = await response.json();-->
+<!--                totalInvPages = data.totalPages;-->
+<!--                renderInventory(data.content);-->
+<!--                renderPagination(totalInvPages, currentInvPage, 'inv-pagination-ul', 'inv-page-info', 'fetchInventory');-->
+<!--            }-->
+<!--        } catch (e) { console.error("Lỗi tải tồn kho"); }-->
+<!--    }-->
+
+<!--    function renderInventory(products) {-->
+<!--        document.getElementById('inventory-list').innerHTML = products.map(p => `-->
+<!--            <tr>-->
+<!--                <td><img src="${p.mainImageUrl || 'https://via.placeholder.com/50'}" class="img-thumbnail-sm"></td>-->
+<!--                <td class="fw-bold">${p.name}</td>-->
+<!--                <td class="text-muted">${p.price.toLocaleString('vi-VN')} ₫</td>-->
+<!--                <td>-->
+<!--                    <input type="number" class="form-control text-center fw-bold ${p.stockQuantity <= 5 ? 'text-danger border-danger' : 'text-success'}"-->
+<!--                           id="stock-${p.id}" value="${p.stockQuantity}" min="0">-->
+<!--                </td>-->
+<!--                <td>-->
+<!--                    <button class="btn btn-sm btn-success fw-bold px-3" onclick="updateStock('${p.id}')">-->
+<!--                        <i class="fas fa-check me-1"></i> Cập nhật-->
+<!--                    </button>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--        `).join('');-->
+<!--    }-->
+
+<!--    async function updateStock(productId) {-->
+<!--        const newQty = document.getElementById(`stock-${productId}`).value;-->
+<!--        try {-->
+<!--            const res = await fetch(`${BASE_URL}/products/${productId}/stock`, {-->
+<!--                method: 'PUT',-->
+<!--                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },-->
+<!--                body: JSON.stringify({ stockQuantity: parseInt(newQty) })-->
+<!--            });-->
+<!--            if (res.ok) {-->
+<!--                showToast('Đã lưu tồn kho!', true);-->
+<!--                fetchInventory(currentInvPage); // Refresh to get correct colors-->
+<!--            } else showToast('Lỗi cập nhật', false);-->
+<!--        } catch (e) { showToast('Lỗi server', false); }-->
+<!--    }-->
+
+<!--    /* ===================== TIỆN ÍCH ===================== */-->
+<!--    function renderPagination(total, current, ulId, infoId, functionName) {-->
+<!--        document.getElementById(infoId).innerText = total > 0 ? `Trang ${current + 1} / ${total}` : 'Không có dữ liệu';-->
+<!--        const ul = document.getElementById(ulId);-->
+<!--        if (total <= 0) { ul.innerHTML = ''; return; }-->
+
+<!--        let html = `<li class="page-item ${current === 0 ? 'disabled' : ''}">-->
+<!--            <button class="page-link" onclick="${functionName}(${current - 1})">Trước</button></li>`;-->
+
+<!--        let start = Math.max(0, current - 2);-->
+<!--        let end = Math.min(total - 1, current + 2);-->
+
+<!--        for (let i = start; i <= end; i++) {-->
+<!--            html += `<li class="page-item ${i === current ? 'active' : ''}">-->
+<!--                <button class="page-link" onclick="${functionName}(${i})">${i + 1}</button></li>`;-->
+<!--        }-->
+
+<!--        html += `<li class="page-item ${current >= total - 1 ? 'disabled' : ''}">-->
+<!--            <button class="page-link" onclick="${functionName}(${current + 1})">Sau</button></li>`;-->
+<!--        ul.innerHTML = html;-->
+<!--    }-->
+
+<!--    function showToast(message, isSuccess) {-->
+<!--        const toastEl = document.getElementById('liveToast');-->
+<!--        toastEl.className = `toast align-items-center text-white border-0 ${isSuccess ? 'bg-success' : 'bg-danger'}`;-->
+<!--        document.getElementById('toast-msg').innerText = message;-->
+<!--        new bootstrap.Toast(toastEl).show();-->
+<!--    }-->
+
+<!--    function logout() {-->
+<!--        localStorage.clear();-->
+<!--        window.location.href = 'auth.html';-->
+<!--    }-->
+    /* ===================== LOGIC QUẢN LÝ ĐƠN HÀNG ===================== */
     async function fetchOrders(page = 0) {
         currentOrderPage = page;
         try {
+            console.log(`Đang gọi API tới: ${BASE_URL}/orders?page=${page}&size=${PAGE_SIZE}`);
+
             const response = await fetch(`${BASE_URL}/orders?page=${page}&size=${PAGE_SIZE}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
+
             if (response.ok) {
                 const data = await response.json();
-                totalOrderPages = data.totalPages;
-                renderOrders(data.content);
+                console.log("Dữ liệu đơn hàng lấy về:", data);
+
+                totalOrderPages = data.totalPages || 0;
+                renderOrders(data.content || []);
                 renderPagination(totalOrderPages, currentOrderPage, 'order-pagination-ul', 'order-page-info', 'fetchOrders');
+            } else {
+                const errorData = await response.text();
+                console.error(`Lỗi API! Status: ${response.status}`);
+                alert(`Không lấy được dữ liệu đơn hàng.`);
             }
-        } catch (e) { console.error("Lỗi tải đơn hàng"); }
+        } catch (e) {
+            console.error("Lỗi kết nối Server:", e);
+        }
+    }
+
+    // Hàm bổ trợ để lấy class màu cho trạng thái (Dùng đúng bảng màu CSS sếp đã viết ở trên)
+    function getStatusClass(status) {
+        return `status-${status}`;
     }
 
     function renderOrders(orders) {
-        document.getElementById('order-list').innerHTML = orders.map(o => `
-            <tr>
-                <td class="fw-bold text-muted">#${o.id.substring(0,8)}</td>
-                <td class="fw-bold">${o.receiverName}</td>
-                <td>${o.receiverPhone}</td>
-                <td class="text-danger fw-bold">${o.totalAmount.toLocaleString('vi-VN')} ₫</td>
-                <td><span class="badge status-${o.status} px-3 py-2">${o.status}</span></td>
-                <td>
-                    <div class="input-group input-group-sm">
-                        <select class="form-select fw-bold" id="status-select-${o.id}">
-                            ${STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
-                        </select>
-                        <button class="btn btn-primary" onclick="updateOrderStatus('${o.id}')">
-                            <i class="fas fa-save"></i> Lưu
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `).join('');
+        const tableBody = document.getElementById('order-list');
+        if (!tableBody) return;
+
+        tableBody.innerHTML = orders.map(o => {
+            // "Phẫu thuật" chuỗi: "Địa chỉ | Tên | SĐT"
+            const addressParts = o.shippingAddress ? o.shippingAddress.split('|').map(item => item.trim()) : [];
+            const address = addressParts[0] || 'N/A';
+            const customerName = addressParts[1] || 'Khách vãng lai';
+            const phone = addressParts[2] || 'Không có số';
+
+            return `
+                <tr>
+                    <td class="fw-bold text-muted">#${o.orderCode || o.id.substring(0,8)}</td>
+                    <td class="fw-bold">${customerName}</td>
+                    <td>${phone}</td>
+                    <td class="text-danger fw-bold">${o.finalAmount ? o.finalAmount.toLocaleString('vi-VN') : 0} ₫</td>
+                    <td><span class="badge ${getStatusClass(o.status)} px-3 py-2">${o.status}</span></td>
+                    <td>
+                        <div class="input-group input-group-sm">
+                            <select class="form-select fw-bold" id="status-select-${o.id}">
+                                ${STATUSES.map(s => `<option value="${s}" ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                            <button class="btn btn-primary" onclick="updateOrderStatus('${o.id}')">
+                                <i class="fas fa-save"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     async function updateOrderStatus(orderId) {
-        const newStatus = document.getElementById(`status-select-${orderId}`).value;
+        const selectEl = document.getElementById(`status-select-${orderId}`);
+        if(!selectEl) return;
+
+        const newStatus = selectEl.value;
         try {
             const res = await fetch(`${BASE_URL}/orders/${orderId}/status`, {
                 method: 'PUT',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                // Lưu ý: Backend cần object { status: "..." }
                 body: JSON.stringify({ status: newStatus })
             });
             if (res.ok) {
                 showToast('Cập nhật trạng thái thành công!', true);
                 fetchOrders(currentOrderPage);
-            } else showToast('Lỗi cập nhật', false);
-        } catch (e) { showToast('Lỗi server', false); }
+            } else {
+                showToast('Lỗi cập nhật trạng thái', false);
+            }
+        } catch (e) {
+            showToast('Lỗi kết nối server', false);
+        }
     }
 
     /* ===================== LOGIC QUẢN LÝ TỒN KHO ===================== */
@@ -232,7 +461,7 @@
             <tr>
                 <td><img src="${p.mainImageUrl || 'https://via.placeholder.com/50'}" class="img-thumbnail-sm"></td>
                 <td class="fw-bold">${p.name}</td>
-                <td class="text-muted">${p.price.toLocaleString('vi-VN')} ₫</td>
+                <td class="text-muted">${p.price ? p.price.toLocaleString('vi-VN') : 0} ₫</td>
                 <td>
                     <input type="number" class="form-control text-center fw-bold ${p.stockQuantity <= 5 ? 'text-danger border-danger' : 'text-success'}"
                            id="stock-${p.id}" value="${p.stockQuantity}" min="0">
@@ -247,7 +476,8 @@
     }
 
     async function updateStock(productId) {
-        const newQty = document.getElementById(`stock-${productId}`).value;
+        const inputEl = document.getElementById(`stock-${productId}`);
+        const newQty = inputEl ? inputEl.value : 0;
         try {
             const res = await fetch(`${BASE_URL}/products/${productId}/stock`, {
                 method: 'PUT',
@@ -256,15 +486,18 @@
             });
             if (res.ok) {
                 showToast('Đã lưu tồn kho!', true);
-                fetchInventory(currentInvPage); // Refresh to get correct colors
+                fetchInventory(currentInvPage);
             } else showToast('Lỗi cập nhật', false);
         } catch (e) { showToast('Lỗi server', false); }
     }
 
     /* ===================== TIỆN ÍCH ===================== */
     function renderPagination(total, current, ulId, infoId, functionName) {
-        document.getElementById(infoId).innerText = total > 0 ? `Trang ${current + 1} / ${total}` : 'Không có dữ liệu';
+        const infoEl = document.getElementById(infoId);
+        if(infoEl) infoEl.innerText = total > 0 ? `Trang ${current + 1} / ${total}` : 'Không có dữ liệu';
+
         const ul = document.getElementById(ulId);
+        if (!ul) return;
         if (total <= 0) { ul.innerHTML = ''; return; }
 
         let html = `<li class="page-item ${current === 0 ? 'disabled' : ''}">
@@ -287,7 +520,8 @@
         const toastEl = document.getElementById('liveToast');
         toastEl.className = `toast align-items-center text-white border-0 ${isSuccess ? 'bg-success' : 'bg-danger'}`;
         document.getElementById('toast-msg').innerText = message;
-        new bootstrap.Toast(toastEl).show();
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
     }
 
     function logout() {

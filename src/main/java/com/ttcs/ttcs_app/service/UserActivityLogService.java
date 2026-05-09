@@ -22,7 +22,7 @@ public class UserActivityLogService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
-    @Async // Đẩy task này sang luồng khác để chạy ngầm
+    @Async
     @Transactional
     public void saveLog(String email, String productId, String actionStr, Float stayTime) {
         try {
@@ -39,8 +39,6 @@ public class UserActivityLogService {
                     .action(actionType)
                     .stayTime(stayTime != null ? stayTime : 0f)
                     .build();
-            // createdAt đã được lo bởi @PrePersist trong Entity của sếp
-
             logRepository.save(logEntry);
 
         } catch (IllegalArgumentException e) {
