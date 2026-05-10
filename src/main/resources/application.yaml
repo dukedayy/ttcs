@@ -30,7 +30,7 @@ application:
     lstm:
       model-path: ./models/behavioral_lstm.zip
     groq:
-      api-key: YOUR_API_KEY
+      api-key: YOUR_GROQ_API_KEY
       model-name: llama-3.3-70b-versatile
 
 #     
