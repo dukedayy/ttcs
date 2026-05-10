@@ -181,6 +181,7 @@
                     localStorage.setItem('ACCESS_TOKEN', data.accessToken);
                     localStorage.setItem('USER_EMAIL', data.email);
                     localStorage.setItem('USER_ROLE', data.role);
+                    localStorage.setItem('USER_ID', data.userId);
 
                     setTimeout(() => {
                         if (data.role === 'ROLE_ADMIN' || data.role === 'ADMIN') {

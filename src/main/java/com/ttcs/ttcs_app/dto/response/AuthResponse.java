@@ -18,4 +18,5 @@ public class AuthResponse {
     // Trả thêm chút thông tin cho Frontend xài
     private String email;
     private String role;
+    private String userId;
 }

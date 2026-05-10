@@ -26,3 +26,11 @@ application:
     jwt:
       secret-key: 5e1cfdac9385a770b557058e33b4cd2390e2bcb95a7d8f74db3463fd54c16b0b
       expiration: 86400000
+  ai:
+    lstm:
+      model-path: ./models/behavioral_lstm.zip
+    groq:
+      api-key: YOUR_GROQ_API_KEY
+      model-name: llama-3.3-70b-versatile
+
+#     
