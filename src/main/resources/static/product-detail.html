@@ -549,6 +549,11 @@
         </div>
     </div>
 </div>
+<div class="container mt-5 pt-5 border-top">
+    <h3 class="fw-bold mb-4"><i class="fas fa-layer-group me-2 text-primary"></i>Sản phẩm tương tự</h3>
+    <div class="row g-4" id="related-products-list">
+    </div>
+</div>
 
 <!-- Modal Buy Now -->
 <div class="modal fade" id="buyNowModal" tabindex="-1">
@@ -617,7 +622,7 @@
             if (response.ok) {
                 currentProduct = await response.json();
                 renderDetail(currentProduct);
-                // Giả sử backend trả về field likedByUser
+                fetchRelatedProducts(productId);
                 isProductLiked = currentProduct.likedByUser || false;
                 updateLikeUI(isProductLiked);
             }
@@ -672,6 +677,37 @@
             icon.className = 'far fa-heart fs-4';
             btn.className = 'btn btn-outline-danger shadow-sm px-4';
         }
+    }
+    async function fetchRelatedProducts(pId) {
+        try {
+            // Đây là API gọi Item-Based (Sản phẩm tương tự món đang xem)
+            const response = await fetch(`${BASE_URL}/product/${pId}/related`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const products = await response.json();
+                renderRelatedList(products);
+            }
+        } catch (e) { console.log("Lỗi tải sản phẩm tương tự"); }
+    }
+
+    function renderRelatedList(products) {
+        const container = document.getElementById('related-products-list');
+        if (products.length === 0) {
+            container.innerHTML = '<p class="text-muted">Không có sản phẩm tương tự phù hợp.</p>';
+            return;
+        }
+        container.innerHTML = products.map(p => `
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-2">
+                    <img src="${p.mainImageUrl}" class="card-img-top rounded-3" onclick="location.href='product-detail.html?id=${p.id}'" style="cursor:pointer">
+                    <div class="card-body px-1 py-2">
+                        <h6 class="fw-bold text-truncate mb-1" onclick="location.href='product-detail.html?id=${p.id}'" style="cursor:pointer">${p.name}</h6>
+                        <p class="text-danger fw-bold small mb-0">${formatCurrency(p.price)}</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
     }
 
     function handleBuyNow() {

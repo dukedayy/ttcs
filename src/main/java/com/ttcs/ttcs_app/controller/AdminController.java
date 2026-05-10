@@ -6,6 +6,7 @@ import com.ttcs.ttcs_app.dto.response.CategoryResponse;
 import com.ttcs.ttcs_app.dto.response.ProductResponse;
 import com.ttcs.ttcs_app.service.AdminService;
 import com.ttcs.ttcs_app.service.AuthService;
+import com.ttcs.ttcs_app.service.UserActivityLogService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,12 @@ import java.util.Map;
 public class AdminController {
     private final AdminService adminService;
     private final AuthService authService;
-
+    private final UserActivityLogService dataService;
+    @GetMapping("/train-rs")
+    public String trainRS() {
+        dataService.refreshAllRecommendations();
+        return "Đã tính toán xong gợi ý cho 30 User!";
+    }
 
     @PostMapping("/products")
     public ResponseEntity<ApiResponse> createProduct(@Valid @RequestBody CreateProductRequest req){
@@ -52,16 +58,14 @@ public class AdminController {
         List<CategoryResponse> list = adminService.listCategory();
         return ResponseEntity.ok(list);
     }
-    // Bắt ID từ URL, bắt Tên mới từ Body
-    @PutMapping("/{id}/rename") // Có thể dùng PUT hoặc PATCH
+
+    @PutMapping("/{id}/rename")
     public ResponseEntity<Map<String, String>> renameCategory(
             @PathVariable("id") String id,
             @Valid @RequestBody CategoryRenameRequestDTO req) {
 
-        // Ném 2 mảnh ghép xuống cho Service xử lý
         adminService.renameCategory(id, req.getNewName());
 
-        // Trả về câu thông báo dạng JSON cho Frontend dễ hiển thị
         Map<String, String> response = new HashMap<>();
         response.put("message", "Đổi tên danh mục thành công!");
 

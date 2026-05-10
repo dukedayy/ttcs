@@ -3,10 +3,7 @@ package com.ttcs.ttcs_app.controller;
 import com.ttcs.ttcs_app.dto.request.AddToCartRequest;
 import com.ttcs.ttcs_app.dto.request.OrderRequest;
 import com.ttcs.ttcs_app.dto.response.*;
-import com.ttcs.ttcs_app.service.AdminService;
-import com.ttcs.ttcs_app.service.CustomerService;
-import com.ttcs.ttcs_app.service.OrderService;
-import com.ttcs.ttcs_app.service.ProductService;
+import com.ttcs.ttcs_app.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +24,9 @@ public class CustomerController {
     private final OrderService orderService;
     private final ProductService productService;
 
+    // --- TIÊM SERVICE RS VÀO ĐÂY ---
+    private final HybridRecommendationService hybridRecommendationService;
+
     @GetMapping("/product")
     public ResponseEntity<Page<ProductResponse>> getSimpledProductPaged(
             @RequestParam(defaultValue = "0") int page,
@@ -41,6 +41,26 @@ public class CustomerController {
             @PathVariable("productId") String productId
     ){
         ProductDetailedResponse result = productService.viewProductDetailed(productId);
+        return ResponseEntity.ok(result);
+    }
+
+    // --- 1. API GỢI Ý TRANG CHỦ (USER-BASED) ---
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<ProductResponse>> getPersonalizedRecommendations() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
+
+        // Gọi service lấy gợi ý dựa trên email/id người dùng
+        List<ProductResponse> result = hybridRecommendationService.getHomePageRecommend(userEmail);
+        return ResponseEntity.ok(result);
+    }
+
+    // --- 2. API SẢN PHẨM TƯƠNG TỰ (ITEM-BASED) ---
+    @GetMapping("/product/{productId}/related")
+    public ResponseEntity<List<ProductResponse>> getRelatedProducts(
+            @PathVariable("productId") String productId
+    ) {
+        List<ProductResponse> result = hybridRecommendationService.getRelatedProducts(productId);
         return ResponseEntity.ok(result);
     }
 
@@ -72,31 +92,30 @@ public class CustomerController {
     public ResponseEntity<ApiResponse> cancelOrder(@RequestParam("orderId") String orderId){
         return ResponseEntity.ok(new ApiResponse(orderService.cancelOrder(orderId)));
     }
+
     @GetMapping("/product/search")
     public ResponseEntity<?> search(@RequestParam(name = "q") String keyword,
                                     @RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "12") int size) {
         return ResponseEntity.ok(productService.searchProducts(keyword, page, size));
     }
+
     @PostMapping("/product/{productId}/like")
     public ResponseEntity<?> toggleLike(@PathVariable String productId) {
-        // Lấy thông tin user từ Security Context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(401).body(new ApiResponse("Bạn cần đăng nhập để like!"));
         }
 
-        // Giả sử sếp lưu username (email) vào principal
         String userEmail = authentication.getName();
 
         boolean isLiked = productService.toggleLike(userEmail, productId);
         return ResponseEntity.ok(new ApiResponse(isLiked ? "Đã thích" : "Đã bỏ thích"));
     }
+
     @GetMapping("/cart")
     public ResponseEntity<CartResponse> getCart() {
         return ResponseEntity.ok(customerService.getCart());
     }
-//    @PutMapping("updateInfo")
-//    public ResponseEntity<>
 }
