@@ -9,6 +9,9 @@ import com.ttcs.ttcs_app.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -82,14 +85,25 @@ public class AdminController {
         return ResponseEntity.ok(new ApiResponse("Đã tạo voucher mới!"));
     }
 
-    @GetMapping("/product")
-    public ResponseEntity<Page<ProductResponse>> getDetailedProductPaged(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ){
-        Page<ProductResponse> result = adminService.getDetailedProductPaged(page, size);
-        return ResponseEntity.ok(result);
-    }
+//    @GetMapping("/product")
+//    public ResponseEntity<Page<ProductResponse>> getDetailedProductPaged(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "20") int size
+//    ){
+//        Page<ProductResponse> result = adminService.getDetailedProductPaged(page, size);
+//        return ResponseEntity.ok(result);
+//    }
+@GetMapping("/product")
+public ResponseEntity<Page<ProductResponse>> getDetailedProductPaged(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size
+){
+    Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").ascending());
+
+    Page<ProductResponse> result = adminService.getDetailedProductPaged(pageable);
+
+    return ResponseEntity.ok(result);
+}
 
     @PostMapping("/users")
     public ResponseEntity<ApiResponse> createAccountForStaff(@Valid @RequestBody CreateStaffAccountRequest request){

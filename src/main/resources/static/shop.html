@@ -299,6 +299,20 @@
         </div>
     </div>
 </nav>
+<div class="container mt-4 mb-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="input-group mb-3 shadow-sm">
+                <input type="text" id="search-input" class="form-control" placeholder="Tìm sản phẩm (ví dụ: iPhone, Áo khoác...)" aria-label="Search">
+                <button class="btn btn-primary" type="button" onclick="handleSearch()">
+                    <i class="fas fa-search"></i> Tìm kiếm
+                </button>
+            </div>
+            <!-- Hiển thị kết quả tìm kiếm cho từ khóa... -->
+            <div id="search-result-info" class="text-muted small ms-2 d-none"></div>
+        </div>
+    </div>
+</div>
 
 <div class="container mt-5 mb-5 pb-5">
     <h2 class="section-title">Sản phẩm mới nhất</h2>
@@ -459,46 +473,144 @@ function trackUserActivity(productId, actionType, stayTime = 0) {
         }
     }
 
+<!--    function renderProducts(products) {-->
+<!--        const productList = document.getElementById('product-list');-->
+<!--        document.getElementById('loading').style.display = 'none';-->
+
+<!--        if (products.length === 0) {-->
+<!--            productList.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-box-open fs-1 mb-3"></i><br><h4>Chưa có sản phẩm nào.</h4></div>';-->
+<!--            return;-->
+<!--        }-->
+
+<!--        productList.innerHTML = products.map(p => `-->
+<!--            <div class="col-12 col-md-6 col-lg-3">-->
+<!--                <div class="card product-card h-100">-->
+<!--                    ${p.stockQuantity > 0 ? `<span class="badge bg-success shadow-sm stock-badge">Kho: ${p.stockQuantity}</span>` : `<span class="badge bg-danger shadow-sm stock-badge">Hết hàng</span>`}-->
+
+<!--                    <div class="card-img-wrapper" style="cursor: pointer;" onclick="goToDetail('${p.id}')">-->
+<!--                        <img src="${p.mainImageUrl || 'https://via.placeholder.com/300x300'}" class="card-img-top">-->
+<!--                    </div>-->
+
+<!--                    <div class="card-body d-flex flex-column p-4">-->
+<!--                        <h5 class="card-title text-truncate" style="cursor: pointer;" title="${p.name}" onclick="goToDetail('${p.id}')">${p.name}</h5>-->
+
+<!--                        <p class="card-text text-muted small mb-3 text-truncate">${p.description || 'Chưa có mô tả'}</p>-->
+<!--                        <div class="price-tag mb-4">${formatCurrency(p.price)}</div>-->
+
+<!--                        <div class="mt-auto d-flex flex-column gap-2">-->
+<!--                            <div class="d-flex gap-2">-->
+<!--                                <input type="number" id="qty-${p.id}" class="form-control text-center qty-input" value="1" min="1" max="${p.stockQuantity}" style="width: 70px;" ${p.stockQuantity === 0 ? 'disabled' : ''}>-->
+<!--                                <button class="btn btn-add-cart flex-grow-1" onclick="addToCart('${p.id}', ${p.stockQuantity})" ${p.stockQuantity === 0 ? 'disabled' : ''}>-->
+<!--                                    <i class="fas fa-cart-plus me-1"></i> Thêm giỏ-->
+<!--                                </button>-->
+<!--                            </div>-->
+<!--                            <button class="btn btn-buy-now text-white w-100" onclick="openBuyNow('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.stockQuantity})" ${p.stockQuantity === 0 ? 'disabled' : ''}>-->
+<!--                                MUA NGAY-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        `).join('');-->
+<!--    }-->
     function renderProducts(products) {
-        const productList = document.getElementById('product-list');
-        document.getElementById('loading').style.display = 'none';
+    const productList = document.getElementById('product-list');
+    document.getElementById('loading').style.display = 'none';
 
-        if (products.length === 0) {
-            productList.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-box-open fs-1 mb-3"></i><br><h4>Chưa có sản phẩm nào.</h4></div>';
-            return;
-        }
+    if (products.length === 0) {
+        productList.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-box-open fs-1 mb-3"></i><br><h4>Chưa có sản phẩm nào.</h4></div>';
+        return;
+    }
 
-        productList.innerHTML = products.map(p => `
-            <div class="col-12 col-md-6 col-lg-3">
-                <div class="card product-card h-100">
-                    ${p.stockQuantity > 0 ? `<span class="badge bg-success shadow-sm stock-badge">Kho: ${p.stockQuantity}</span>` : `<span class="badge bg-danger shadow-sm stock-badge">Hết hàng</span>`}
+    productList.innerHTML = products.map(p => `
+        <div class="col-12 col-md-6 col-lg-3">
+            <div class="card product-card h-100">
+                ${p.stockQuantity > 0 ? `<span class="badge bg-success shadow-sm stock-badge">Kho: ${p.stockQuantity}</span>` : `<span class="badge bg-danger shadow-sm stock-badge">Hết hàng</span>`}
 
-                    <div class="card-img-wrapper" style="cursor: pointer;" onclick="goToDetail('${p.id}')">
-                        <img src="${p.mainImageUrl || 'https://via.placeholder.com/300x300'}" class="card-img-top">
-                    </div>
+                <!-- Click vào ảnh sẽ sang trang product-detail.html -->
+                <div class="card-img-wrapper" style="cursor: pointer;" onclick="goToDetail('${p.id}')">
+                    <img src="${p.mainImageUrl || 'https://via.placeholder.com/300x300'}" class="card-img-top">
+                </div>
 
-                    <div class="card-body d-flex flex-column p-4">
-                        <h5 class="card-title text-truncate" style="cursor: pointer;" title="${p.name}" onclick="goToDetail('${p.id}')">${p.name}</h5>
+                <div class="card-body d-flex flex-column p-4">
+                    <!-- Click vào tên cũng sang trang product-detail.html -->
+                    <h5 class="card-title text-truncate" style="cursor: pointer;" title="${p.name}" onclick="goToDetail('${p.id}')">${p.name}</h5>
 
-                        <p class="card-text text-muted small mb-3 text-truncate">${p.description || 'Chưa có mô tả'}</p>
-                        <div class="price-tag mb-4">${formatCurrency(p.price)}</div>
+                    <p class="card-text text-muted small mb-3 text-truncate">${p.description || 'Chưa có mô tả'}</p>
+                    <div class="price-tag mb-4">${formatCurrency(p.price)}</div>
 
-                        <div class="mt-auto d-flex flex-column gap-2">
-                            <div class="d-flex gap-2">
-                                <input type="number" id="qty-${p.id}" class="form-control text-center qty-input" value="1" min="1" max="${p.stockQuantity}" style="width: 70px;" ${p.stockQuantity === 0 ? 'disabled' : ''}>
-                                <button class="btn btn-add-cart flex-grow-1" onclick="addToCart('${p.id}', ${p.stockQuantity})" ${p.stockQuantity === 0 ? 'disabled' : ''}>
-                                    <i class="fas fa-cart-plus me-1"></i> Thêm giỏ
-                                </button>
-                            </div>
-                            <button class="btn btn-buy-now text-white w-100" onclick="openBuyNow('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.stockQuantity})" ${p.stockQuantity === 0 ? 'disabled' : ''}>
-                                MUA NGAY
+                    <div class="mt-auto d-flex flex-column gap-2">
+                        <div class="d-flex gap-2">
+                            <input type="number" id="qty-${p.id}" class="form-control text-center qty-input" value="1" min="1" max="${p.stockQuantity}" style="width: 70px;" ${p.stockQuantity === 0 ? 'disabled' : ''}>
+                            <button class="btn btn-add-cart flex-grow-1" onclick="addToCart('${p.id}', ${p.stockQuantity})" ${p.stockQuantity === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-cart-plus me-1"></i> Thêm giỏ
                             </button>
                         </div>
+
+                        <!-- Nút MUA NGAY vẫn giữ nguyên để hiện Modal tại trang chủ -->
+                        <button class="btn btn-buy-now text-white w-100" onclick="openBuyNow('${p.id}', '${p.name.replace(/'/g, "\\'")}', ${p.price}, ${p.stockQuantity})" ${p.stockQuantity === 0 ? 'disabled' : ''}>
+                            MUA NGAY
+                        </button>
+
+                        <!-- Thêm nút Xem chi tiết cho rõ ràng (Tùy chọn) -->
+                        <button class="btn btn-outline-primary btn-sm mt-2 border-0" onclick="goToDetail('${p.id}')">
+                            Xem chi tiết <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-        `).join('');
+        </div>
+    `).join('');
+}
+
+    function goToDetail(productId) {
+        window.location.href = `product-detail.html?id=${productId}`;
     }
+
+    //SEARCH
+    // Bắt sự kiện nhấn phím Enter trong ô input cho tiện
+document.getElementById('search-input')?.addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        handleSearch();
+    }
+});
+
+async function handleSearch(page = 0) {
+    const keyword = document.getElementById('search-input').value.trim();
+    const resultInfo = document.getElementById('search-result-info');
+
+    // Nếu để trống thì load lại toàn bộ sản phẩm như ban đầu
+    if (!keyword) {
+        resultInfo.classList.add('d-none');
+        fetchProducts(0); // Gọi lại hàm load mặc định của sếp
+        return;
+    }
+
+    try {
+        // q là tham số keyword sếp đặt ở Controller
+        const response = await fetch(`${BASE_URL}/product/search?q=${encodeURIComponent(keyword)}&page=${page}&size=12`);
+
+        if (response.ok) {
+            const data = await response.json();
+
+            // Hiển thị thông báo tìm thấy bao nhiêu kết quả
+            resultInfo.innerText = `Tìm thấy ${data.totalElements} sản phẩm cho "${keyword}"`;
+            resultInfo.classList.remove('d-none');
+
+            // Dùng chính hàm render cũ của sếp để vẽ lại danh sách
+            renderProducts(data.content);
+
+            // Nếu sếp có làm phân trang thì cập nhật luôn
+            if (typeof renderPagination === "function") {
+                renderPagination(data.totalPages, page, 'handleSearch');
+            }
+        } else {
+            console.error("Lỗi khi tìm kiếm");
+        }
+    } catch (error) {
+        console.error("Lỗi kết nối:", error);
+    }
+}
 
     // THUẬT TOÁN RENDER NÚT PHÂN TRANG THÔNG MINH
     function renderPaginationNumbers() {
@@ -672,6 +784,18 @@ function trackUserActivity(productId, actionType, stayTime = 0) {
             btn.innerText = 'CHỐT ĐƠN NGAY';
         }
     }
+    function handleSearch() {
+    const keyword = document.getElementById('search-input').value;
+    if (keyword.trim()) {
+        // Gọi API tìm kiếm và render lại danh sách sản phẩm
+        fetch(`${BASE_URL}/product/search?q=${encodeURIComponent(keyword)}`)
+            .then(res => res.json())
+            .then(data => {
+                renderProducts(data.content);
+                renderPagination(data);
+            });
+    }
+}
 
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);

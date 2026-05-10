@@ -33,12 +33,12 @@ public class StaffController {
     }
 
     // Tái sử dụng hàm lấy danh sách sản phẩm của Admin/Customer
-    @GetMapping("/products")
-    public ResponseEntity<?> getProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(adminService.getDetailedProductPaged(page, size));
-    }
+//    @GetMapping("/products")
+//    public ResponseEntity<?> getProducts(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "20") int size) {
+//        return ResponseEntity.ok(adminService.getDetailedProductPaged(page, size));
+//    }
 
     @PutMapping("/products/{id}/stock")
     public ResponseEntity<?> updateStock(
