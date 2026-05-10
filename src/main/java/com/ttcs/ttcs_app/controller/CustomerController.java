@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -69,6 +71,27 @@ public class CustomerController {
     @PutMapping("/cancel-order")
     public ResponseEntity<ApiResponse> cancelOrder(@RequestParam("orderId") String orderId){
         return ResponseEntity.ok(new ApiResponse(orderService.cancelOrder(orderId)));
+    }
+    @GetMapping("/product/search")
+    public ResponseEntity<?> search(@RequestParam(name = "q") String keyword,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "12") int size) {
+        return ResponseEntity.ok(productService.searchProducts(keyword, page, size));
+    }
+    @PostMapping("/product/{productId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable String productId) {
+        // Lấy thông tin user từ Security Context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(401).body(new ApiResponse("Bạn cần đăng nhập để like!"));
+        }
+
+        // Giả sử sếp lưu username (email) vào principal
+        String userEmail = authentication.getName();
+
+        boolean isLiked = productService.toggleLike(userEmail, productId);
+        return ResponseEntity.ok(new ApiResponse(isLiked ? "Đã thích" : "Đã bỏ thích"));
     }
     @GetMapping("/cart")
     public ResponseEntity<CartResponse> getCart() {

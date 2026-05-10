@@ -13,6 +13,7 @@
     import org.springframework.data.domain.Page;
     import org.springframework.data.domain.PageRequest;
     import org.springframework.data.domain.Pageable;
+    import org.springframework.data.domain.Sort;
     import org.springframework.stereotype.Service;
     import org.springframework.transaction.annotation.Transactional;
 
@@ -60,20 +61,36 @@
             return res;
         }
 
-        public Page<ProductResponse> getDetailedProductPaged(int page, int size){
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Product> entityPage = productRepository.findAll(pageable);
-            return entityPage.map(product -> ProductResponse.builder()
-                    .id(product.getId())
-                    .name(product.getName())
-                    .price(product.getPrice())
-                    .weight(product.getWeight())
-                    .description(product.getDescription())
-                    .stockQuantity(product.getStockQuantity())
-                    .categoryId(product.getCategory().getId())
-                    .mainImageUrl(product.getMainImageUrl())
-                    .build());
-        }
+//        public Page<ProductResponse> getDetailedProductPaged(int page, int size){
+//            Pageable pageable = PageRequest.of(page, size);
+//            Page<Product> entityPage = productRepository.findAll(pageable);
+//            return entityPage.map(product -> ProductResponse.builder()
+//                    .id(product.getId())
+//                    .name(product.getName())
+//                    .price(product.getPrice())
+//                    .weight(product.getWeight())
+//                    .description(product.getDescription())
+//                    .stockQuantity(product.getStockQuantity())
+//                    .categoryId(product.getCategory().getId())
+//                    .mainImageUrl(product.getMainImageUrl())
+//                    .build());
+//        }
+public Page<ProductResponse> getDetailedProductPaged(Pageable pageable) {
+    // Sử dụng trực tiếp pageable đã được truyền từ Controller (đã bao gồm sort)
+    Page<Product> entityPage = productRepository.findAll(pageable);
+
+    return entityPage.map(product -> ProductResponse.builder()
+            .id(product.getId())
+            .name(product.getName())
+            .price(product.getPrice())
+            .weight(product.getWeight())
+            .description(product.getDescription())
+            .stockQuantity(product.getStockQuantity())
+            // Kiểm tra null cho category để tránh lỗi sập API nếu dữ liệu thiếu
+            .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
+            .mainImageUrl(product.getMainImageUrl())
+            .build());
+}
         // chưa đc dùng
         public Page<ProductResponse> getSimpledProductPaged(int page, int size){
             Pageable pageable = PageRequest.of(page, size);
